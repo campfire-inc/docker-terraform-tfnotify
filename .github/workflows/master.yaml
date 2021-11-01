@@ -29,11 +29,11 @@ jobs:
 
     steps:
       - run: |
-        results=${{ needs.build_and_push_to_publicecr.outputs.directory }}
-        for v in ${results[@]}; do
-          version=$(echo ${v} | sed -e s/_/./g)
-          echo $version
-        done
+          results=${{ needs.build_and_push_to_publicecr.outputs.directory }}
+          for v in ${results[@]}; do
+            version=$(echo ${v} | sed -e s/_/./g)
+            echo $version
+          done
         
 
       # - name: 2
