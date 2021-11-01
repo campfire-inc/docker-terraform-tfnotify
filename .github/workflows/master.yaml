@@ -25,10 +25,11 @@ jobs:
     needs: build_and_push_to_publicecr
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         directory: ${{fromJson(needs.build_and_push_to_publicecr.outputs.directory)}}
     steps:
       - run: |
-          #!/bin/bash
-          version=$(echo ${matrix.directory} | sed -e s/_/./g)
+          echo ${{ matrix.directory }}
+          version=$(echo ${{ matrix.directory }} | sed -e s/_/./g)
           echo $version
