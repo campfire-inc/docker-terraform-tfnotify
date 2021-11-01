@@ -23,14 +23,15 @@ jobs:
   get_directory:
     needs: build_and_push_to_publicecr
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     directory: ${{fromJson(needs.set-matrix.outputs.something)}}
-
+    strategy:
+      matrix:
+        directory: (${{ needs.build_and_push_to_publicecr.outputs.directory }})
     steps:
       - run: |
-          results=(${{ needs.build_and_push_to_publicecr.outputs.directory }})
-          for v in ${results[@]}; do
-            version=$(echo ${v} | sed -e s/_/./g)
-            echo $version
-          done
+          echo ${{ matrix.directory }}
+      # - run: |
+      #     results=(${{ needs.build_and_push_to_publicecr.outputs.directory }})
+      #     for v in ${results[@]}; do
+      #       version=$(echo ${v} | sed -e s/_/./g)
+      #       echo $version
+      #     done
