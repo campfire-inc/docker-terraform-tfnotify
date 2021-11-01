@@ -29,5 +29,6 @@ jobs:
         directory: ${{fromJson(needs.build_and_push_to_publicecr.outputs.directory)}}
     steps:
       - run: |
-          version=$(echo ${matrix.directory } | sed -e s/_/./g)
+          #!/bin/bash
+          version=$(echo ${matrix.directory} | sed -e s/_/./g)
           echo $version
