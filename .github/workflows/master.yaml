@@ -19,14 +19,14 @@ jobs:
         run: |
           results=["$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"  | tr '\n' ',' | sed -e 's/,$/\n/g')"]
           echo results
-          echo "::set-output name=value::${results[@]}"
+          echo "::set-output name=value::${results}"
 
   get_directory:
     needs: build_and_push_to_publicecr
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        directory: [0_11_14,0_12_19,0_12_28,0_12_29,0_13_3,0_13_7]
+        directory: ${{needs.build_and_push_to_publicecr.outputs.directory}}
     steps:
       - run: |
           echo ${{ matrix.directory }}
