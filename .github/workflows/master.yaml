@@ -17,16 +17,16 @@ jobs:
       - name: get results
         id: set-directory
         run: |
-          results="$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"  | tr '\n' ',' | sed -e 's/,$/\n/g')"
-          list=(${results//,/ })
-          echo "::set-output name=value::${list[@]}"
+          results="[\"$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"  | tr '\n' ',' | sed -e 's/,$/\n/g' | sed -e 's/,/\",\"/g')\"]"
+          list=$(echo $results | jq -c)
+          echo "::set-output name=value::${list}"
 
   get_directory:
     needs: build_and_push_to_publicecr
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        directory: ${{needs.build_and_push_to_publicecr.outputs.directory}}
+        directory: ${{fromJson(needs.build_and_push_to_publicecr.outputs.directory)}}
     steps:
       # - run: |
       #     echo ${{ matrix.directory }}
