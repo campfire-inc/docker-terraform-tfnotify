@@ -31,7 +31,8 @@ jobs:
       # - run: |
       #     echo ${{ matrix.directory }}
       - run: |
-          results=${{ needs.build_and_push_to_publicecr.outputs.directory }}
+          # results=${{ needs.build_and_push_to_publicecr.outputs.directory }}
+          echo ${{ needs.build_and_push_to_publicecr.outputs.directory }}
       #     echo results
       #     # for v in ${results[@]}; do
       #     #   version=$(echo ${v} | sed -e s/_/./g)
