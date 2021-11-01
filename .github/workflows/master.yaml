@@ -17,21 +17,22 @@ jobs:
       - name: get results
         id: set-directory
         run: |
-          results=($(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"))
+          results=[$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}") | sed -e s/ /, /g)]
           echo "::set-output name=value::${results[@]}"
 
   get_directory:
     needs: build_and_push_to_publicecr
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        directory: ${{ [needs.build_and_push_to_publicecr.outputs.directory] }}
+    # strategy:
+    #   matrix:
+    #     directory: ${{ [needs.build_and_push_to_publicecr.outputs.directory] }}
     steps:
-      - run: |
-          echo ${{ matrix.directory }}
       # - run: |
-      #     results=(${{ needs.build_and_push_to_publicecr.outputs.directory }})
-      #     for v in ${results[@]}; do
-      #       version=$(echo ${v} | sed -e s/_/./g)
-      #       echo $version
-      #     done
+      #     echo ${{ matrix.directory }}
+      - run: |
+          results=${{ needs.build_and_push_to_publicecr.outputs.directory }}
+          echo results
+          # for v in ${results[@]}; do
+          #   version=$(echo ${v} | sed -e s/_/./g)
+          #   echo $version
+          # done
