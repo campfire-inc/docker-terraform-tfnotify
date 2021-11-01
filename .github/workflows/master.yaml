@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        directory: ${{needs.build_and_push_to_publicecr.outputs.directory}}
+        directory: ["0_11_14","0_12_19","0_12_28","0_12_29","0_13_3","0_13_7"]
     steps:
       - run: |
           echo ${{ matrix.directory }}
