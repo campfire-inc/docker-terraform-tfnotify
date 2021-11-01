@@ -30,10 +30,7 @@ jobs:
     steps:
       - run: |
           results=${{ fromJson(needs.build_and_push_to_publicecr.outputs.directory) }}
-          for v in ${results[@]}; do
-            version=$(echo ${v} | sed -e s/_/./g)
-            echo $version
-          done
+          echo results
         
 
       # - name: 2
