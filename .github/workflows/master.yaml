@@ -1,0 +1,50 @@
+name: master workflow
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: setup
+    outputs:
+      directories: ${{ steps.set-directories.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: get directories
+        id: set-directories
+        run: |
+          results="[\"$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"  | tr '\n' ',' | sed -e 's/,$/\n/g' | sed -e 's/,/\",\"/g')\"]"
+          list=$(echo $results | jq -c)
+          echo "::set-output name=value::${list}"
+
+  build_and_push:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directories: ${{fromJson(needs.setup.outputs.directories)}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build, tag, and push image to Amazon PublicECR
+        env:
+          ECR_REGISTRY: public.ecr.aws/f1m7u9r1
+          ECR_REPOSITORY: terraform-circleci-base-image
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+          version=$(echo ${{ matrix.directories }} | sed -e s/_/./g)
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${version} ./${{ matrix.directories }}/
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${version}
