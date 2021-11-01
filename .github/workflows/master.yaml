@@ -24,9 +24,9 @@ jobs:
   get_directory:
     needs: build_and_push_to_publicecr
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     directory: ${{needs.build_and_push_to_publicecr.outputs.directory}}
+    strategy:
+      matrix:
+        directory: ${{needs.build_and_push_to_publicecr.outputs.directory}}
     steps:
       # - run: |
       #     echo ${{ matrix.directory }}
