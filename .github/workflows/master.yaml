@@ -19,7 +19,7 @@ jobs:
         run: |
           results="$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"  | tr '\n' ',' | sed -e 's/,$/\n/g')"
           list=(${results//,/ })
-          echo "::set-output name=value::${list}"
+          echo "::set-output name=value::${list[@]}"
 
   get_directory:
     needs: build_and_push_to_publicecr
