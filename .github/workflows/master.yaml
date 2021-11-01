@@ -2,12 +2,32 @@ name: master workflow
 
 on:
   push:
-    branches: [ master ]
+    branches: [ feature/add-github-actions ]
 
 jobs:
-  build_and_push_to_publicecr:
+  setup:
     runs-on: ubuntu-latest
-    name: build_and_push_to_publicecr
+    name: setup
+    outputs:
+      directories: ${{ steps.set-directories.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: get directories
+        id: set-directories
+        run: |
+          results="[\"$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"  | tr '\n' ',' | sed -e 's/,$/\n/g' | sed -e 's/,/\",\"/g')\"]"
+          list=$(echo $results | jq -c)
+          echo "::set-output name=value::${list}"
+
+  build_and_push:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directories: ${{fromJson(needs.setup.outputs.directories)}}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,9 +45,6 @@ jobs:
           ECR_REPOSITORY: terraform-circleci-base-image
         run: |
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
-          results=$(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}")
-          for v in ${results[@]}; do
-            version=$(echo ${v} | sed -e s/_/./g)
-            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${version} ./${v}/
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${version}
-          done
+          version=$(echo ${{ matrix.directories }} | sed -e s/_/./g)
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${version} ./${{ matrix.directories }}/
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${version}
