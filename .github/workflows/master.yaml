@@ -18,7 +18,7 @@ jobs:
         id: set-directory
         run: |
           results=($(ls | grep -E "[0-9]{1,2}_[0-9]{1,2}_[0-9]{1,2}"))
-          echo ${results[@] | sed -e s/ /, /g}
+          echo results[@] | sed -e s/ /, /g
           echo "::set-output name=value::${results[@]}"
 
   get_directory:
