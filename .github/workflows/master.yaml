@@ -28,12 +28,9 @@ jobs:
     #     directory: ${{fromJson(needs.set-matrix.outputs.something)}}
 
     steps:
-      - run: echo ${{ needs.build_and_push_to_publicecr.outputs.directory }}
-        
-
-      # - name: 2
-      #   run: |
-      #     for v in ${results[@]}; do
-      #       version=$(echo ${v} | sed -e s/_/./g)
-      #       echo $version
-      #     done
+      - run: |
+        for v in ${{ needs.build_and_push_to_publicecr.outputs.directory }}; do
+          version=$(echo ${v} | sed -e s/_/./g)
+          echo $version
+        done
+          
